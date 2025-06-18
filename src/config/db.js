@@ -1,33 +1,16 @@
-// Get the client
 import mysql from 'mysql2/promise';
+import 'dotenv/config';
 
-// Create the connection to database
-const connection = await mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    database: process.env.DB_NAME || 'calsur',
+    password: process.env.DB_PASSWORD || '',
+    waitForConnections: true,
+    connectionLimit: 10,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    queueLimit: 0
 });
 
-// A simple SELECT query
-try {
-  const [results, fields] = await connection.query(
-    'SELECT * FROM `table` WHERE `name` = "Page" AND `age` > 45'
-  );
-
-  console.log(results); // results contains rows returned by server
-  console.log(fields); // fields contains extra meta data about results, if available
-} catch (err) {
-  console.log(err);
-}
-
-// Using placeholders
-try {
-  const [results] = await connection.query(
-    'SELECT * FROM `table` WHERE `name` = ? AND `age` > ?',
-    ['Page', 45]
-  );
-
-  console.log(results);
-} catch (err) {
-  console.log(err);
-}
+export default pool;
